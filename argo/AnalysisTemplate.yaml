@@ -1,0 +1,28 @@
+kind: AnalysisTemplate
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: pre-promotion-analysis
+  namespace: {{ .Values.namespace }}
+spec:
+  metrics:
+  - name: webmetric
+    successCondition: "result.series >= 'f1' && result.limit >= '30'"
+    provider:
+      web:
+        url: "http://ergast.com/api/f1/2004/1/results.json"
+        jsonPath: "{$.MRData}"
+              
+---
+kind: AnalysisTemplate
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: post-promotion-analysis
+  namespace: {{ .Values.namespace }}
+spec:
+  metrics:
+  - name: webmetric
+    successCondition: "result.series >= 'f1' && result.limit >= '30'"
+    provider:
+      web:
+        url: "http://ergast.com/api/f1/2004/1/results.json"
+        jsonPath: "{$.MRData}"
