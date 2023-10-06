@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1 # Changed from apps/v1
+kind: Rollout # Changed from Deployment
+metadata:
+  name: {{ .Values.namespace }}-deploy
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 5
+  selector:
+    matchLabels: 
+      app: {{ .Values.namespace }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.namespace }}
+    spec:
+      containers:
+        - name: {{ .Values.namespace }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: Always
+          ports:
+          - name: web
+            containerPort: 3000
+      imagePullSecrets:
+        - name: vth
+  minReadySeconds: 30
+  revisionHistoryLimit: 3
+  strategy:
+    blueGreen:
+      activeService: {{ .Values.namespace }}-svc-active
+      previewService: {{ .Values.namespace }}-svc-preview
+      scaleDownDelaySeconds: 30
+      previewReplicaCount: 2
+      autoPromotionEnabled: true
+      
+      prePromotionAnalysis:
+        templates:
+        - templateName: pre-promotion-analysis
+      postPromotionAnalysis:
+        templates:
+        - templateName: post-promotion-analysis
