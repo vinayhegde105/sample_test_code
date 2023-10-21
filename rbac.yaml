@@ -1,0 +1,30 @@
+rbac:
+  create: true
+  role: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      name: argocd-namespace-role
+    rules:
+    - apiGroups: [""]
+      resources: ["*"]
+      verbs: ["*"]
+    - apiGroups: ["argoproj.io"]
+      resources: ["applications"]
+      verbs: ["*"]
+  roleRef: |
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: argocd-namespace-role
+  roleBinding: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: argocd-namespace-role-binding
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: argocd-namespace-role
+    subjects:
+    - kind: ServiceAccount
+      name: argocd-server
